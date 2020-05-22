@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify, render_template, url_for
 import pickle
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import json
+import requests
 
 
 app = Flask(__name__)
@@ -17,7 +19,16 @@ def scaling(test):
     test = sc.transform(test)
     return test
       
-
+def inverse_transform(test):
+    file = pd.read_csv('data/turbine_training_set.csv')
+    file = file['output_power'].values.reshape(-1,1)
+    
+    sc = MinMaxScaler()
+    train = sc.fit_transform(file)
+    #test = test.values.reshape(-1,1)
+    result = sc.inverse_transform(test)
+    return result
+    
 @app.route('/')
 def home():
     #return 'Hello World'
@@ -76,4 +87,4 @@ def predict_api():
 
 if __name__ == '__main__':
     print('starting the app')
-    app.run(debug=True, use_reloader=False )
+    app.run(port = 1000, debug=True, use_reloader=False )
